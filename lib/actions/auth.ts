@@ -57,14 +57,31 @@ export const signUp = async (
 
   if (!success) return redirect("/too-fast");
 
-  const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  // Check for duplicate email
+  const existingEmail = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
-  if (existingUser.length > 0) {
+  if (existingEmail.length > 0) {
     return {
       success: false,
-      error: "User already exists",
+      error: "Email already registered. Please sign in instead.",
     };
   }
+
+  // Check for duplicate university ID
+  const existingUniversityId = await db
+    .select()
+    .from(users)
+    .where(eq(users.universityId, universityId))
+    .limit(1);
+
+  if (existingUniversityId.length > 0) {
+    return {
+      success: false,
+      error:
+        "This University ID is already registered. Please contact support if this is an error.",
+    };
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
@@ -87,11 +104,29 @@ export const signUp = async (
     return {
       success: true,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.log(error, "Error creating user");
+
+    // Handle specific database errors
+    if (error?.code === "23505") {
+      if (error.constraint === "users_email_unique") {
+        return {
+          success: false,
+          error: "Email already registered. Please sign in instead.",
+        };
+      }
+      if (error.constraint === "users_university_id_unique") {
+        return {
+          success: false,
+          error:
+            "This University ID is already registered. Please contact support if this is an error.",
+        };
+      }
+    }
+
     return {
       success: false,
-      error: "Signup error",
+      error: "An error occurred during signup. Please try again.",
     };
   }
 };
