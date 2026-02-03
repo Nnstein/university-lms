@@ -147,7 +147,7 @@ export const sorts = [
 export const FIELD_TYPES: Record<string, string> = {
   fullName: "text",
   email: "email",
-  universityID: "number",
+  universityId: "number",
   password: "password",
 };
 
@@ -155,7 +155,7 @@ export const FIELD_TYPES: Record<string, string> = {
 export const FIELD_NAMES: Record<string, string> = {
   fullName: "Full Name",
   email: "Email",
-  universityID: "University ID Number",
+  universityId: "University ID Number",
   universityCard: "Upload University ID Card",
   password: "Password",
 };
