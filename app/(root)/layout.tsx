@@ -17,17 +17,20 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
   after(async () => {
     if (!session?.user?.id) return;
 
-    // get the user and see if the ;ast activity date is today
+    // Get the user and check if the last activity date is today
     const user = await db.select().from(users).where(eq(users.id, session?.user?.id)).limit(1);
 
-    if (user[0].lastActivityDate === new Date().toISOString().slice(0, 10)) {
+    // Safety check: ensure user exists
+    if (!user || user.length === 0) return;
+
+    // Check if last activity date is today
+    const today = new Date().toISOString().slice(0, 10);
+    if (user[0].lastActivityDate === today) {
       return;
     }
 
-    await db
-      .update(users)
-      .set({ lastActivityDate: new Date().toISOString().slice(0, 10) })
-      .where(eq(users.id, session?.user?.id));
+    // Update last activity date
+    await db.update(users).set({ lastActivityDate: today }).where(eq(users.id, session?.user?.id));
   });
 
   return (

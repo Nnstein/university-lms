@@ -11,7 +11,7 @@ const qstashClient = new QStashClient({
   token: config.env.upstash.qstashToken!,
 });
 
-export const sendEmail = async (email: string, subject: string, message: string) => {
+export const sendEmail = async (email: string, subject: string, html: string) => {
   await qstashClient.publishJSON({
     api: {
       name: "email",
@@ -21,7 +21,7 @@ export const sendEmail = async (email: string, subject: string, message: string)
       from: "BookSurf <contact@nnstein.me>",
       to: [email],
       subject,
-      message,
+      html,
     },
   });
 };
